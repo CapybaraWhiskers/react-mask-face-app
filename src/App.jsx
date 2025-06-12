@@ -50,7 +50,7 @@ function App() {
     form.append('image', file)
     const res = await fetch('/api/upload', { method: 'POST', body: form })
     const { url } = await res.json()
-    setImageUrl(url)
+    setImageUrl(`${url}?${Date.now()}`)
   }
 
   const handleImageLoad = async e => {
