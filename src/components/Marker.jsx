@@ -30,25 +30,16 @@ function makeDraggableResizable(el, onUpdate) {
     if (onUpdate) onUpdate(el)
   })
 
-  el.addEventListener(
-    'wheel',
-    e => {
-      e.preventDefault()
-      e.stopPropagation()
-      const delta = e.deltaY < 0 ? 1 : -1
-      let size = parseFloat(el.style.width)
-      if (Number.isNaN(size)) {
-        size = el.getBoundingClientRect().width
-      }
-      size += delta * 5
-      size = Math.max(10, size)
-      el.style.width = size + 'px'
-      el.style.height = size + 'px'
-      el.style.fontSize = size + 'px'
-      if (onUpdate) onUpdate(el)
-    },
-    { passive: false }
-  )
+  el.addEventListener('wheel', e => {
+    e.preventDefault()
+    let size = parseFloat(el.style.width)
+    size += e.deltaY < 0 ? 5 : -5
+    size = Math.max(10, size)
+    el.style.width = size + 'px'
+    el.style.height = size + 'px'
+    el.style.fontSize = size + 'px'
+    if (onUpdate) onUpdate(el)
+  })
 }
 
 function drawMosaicCanvas(canvas, image, pixel) {
