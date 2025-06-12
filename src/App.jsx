@@ -67,14 +67,19 @@ function App() {
     const scaleX = img.clientWidth / img.naturalWidth
     const scaleY = img.clientHeight / img.naturalHeight
     const newMarkers = detections.map(det => {
-      const { x, y, width } = det.detection.box
+      const { x, y, width, height } = det.detection.box
+      const sizeW = width * scaleX
+      const sizeH = height * scaleY
+      const size = Math.max(sizeW, sizeH)
+      const adjustedX = x * scaleX - (size - sizeW) / 2
+      const adjustedY = y * scaleY - (size - sizeH) / 2
       if (maskType === 'mosaic') {
         return {
           id: nextId(),
           type: 'mosaic',
-          x: x * scaleX,
-          y: y * scaleY,
-          size: width * scaleX,
+          x: adjustedX,
+          y: adjustedY,
+          size,
           pixel: mosaicSize,
           dimmed: false
         }
@@ -86,9 +91,9 @@ function App() {
       return {
         id: nextId(),
         type: 'emoji',
-        x: x * scaleX,
-        y: y * scaleY,
-        size: width * scaleX,
+        x: adjustedX,
+        y: adjustedY,
+        size,
         emoji: expressionEmojiMap[best] || '😊',
         dimmed: false
       }
