@@ -67,19 +67,14 @@ function App() {
     const scaleX = img.clientWidth / img.naturalWidth
     const scaleY = img.clientHeight / img.naturalHeight
     const newMarkers = detections.map(det => {
-      const { x, y, width, height } = det.detection.box
-      const cx = (x + width / 2) * scaleX
-      const cy = (y + height / 2) * scaleY
-      const size = Math.max(width * scaleX, height * scaleY) * 1.2
-      const left = cx - size / 2
-      const top = cy - size / 2
+      const { x, y, width } = det.detection.box
       if (maskType === 'mosaic') {
         return {
           id: nextId(),
           type: 'mosaic',
-          x: left,
-          y: top,
-          size,
+          x: x * scaleX,
+          y: y * scaleY,
+          size: width * scaleX,
           pixel: mosaicSize,
           dimmed: false
         }
@@ -91,9 +86,9 @@ function App() {
       return {
         id: nextId(),
         type: 'emoji',
-        x: left,
-        y: top,
-        size,
+        x: x * scaleX,
+        y: y * scaleY,
+        size: width * scaleX,
         emoji: expressionEmojiMap[best] || '😊',
         dimmed: false
       }
@@ -169,17 +164,15 @@ function App() {
     <div className="app-card">
       <h1>Mask Face App</h1>
       <ImageUploader onChange={handleImageChange} loading={loading} />
-      {!loading && (
-        <ImagePreview
-          imageUrl={imageUrl}
-          markers={markers}
-          imgRef={imgRef}
-          onLoad={handleImageLoad}
-          onUpdate={updateMarker}
-          onToggle={toggleMarker}
-          onClick={() => setMarkers(m => m)}
-        />
-      )}
+      <ImagePreview
+        imageUrl={imageUrl}
+        markers={markers}
+        imgRef={imgRef}
+        onLoad={handleImageLoad}
+        onUpdate={updateMarker}
+        onToggle={toggleMarker}
+        onClick={() => setMarkers(m => m)}
+      />
       <Controls
         maskType={maskType}
         setMaskType={setMaskType}

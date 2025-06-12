@@ -4,7 +4,7 @@ function makeDraggableResizable(el, onUpdate) {
   let dragging = false
   let startX, startY, startLeft, startTop
 
-  const handlePointerDown = e => {
+  el.addEventListener('pointerdown', e => {
     e.stopPropagation()
     dragging = true
     el._wasDragged = false
@@ -13,45 +13,33 @@ function makeDraggableResizable(el, onUpdate) {
     startLeft = parseFloat(el.style.left)
     startTop = parseFloat(el.style.top)
     el.setPointerCapture(e.pointerId)
-  }
+  })
 
-  const handlePointerMove = e => {
+  el.addEventListener('pointermove', e => {
     if (!dragging) return
     const dx = e.clientX - startX
     const dy = e.clientY - startY
     el.style.left = startLeft + dx + 'px'
     el.style.top = startTop + dy + 'px'
     el._wasDragged = true
-  }
+  })
 
-  const handlePointerUp = e => {
+  el.addEventListener('pointerup', e => {
     dragging = false
     el.releasePointerCapture(e.pointerId)
     if (onUpdate) onUpdate(el)
-  }
+  })
 
-  const handleWheel = e => {
+  el.addEventListener('wheel', e => {
     e.preventDefault()
     let size = parseFloat(el.style.width)
-    size += Math.sign(e.deltaY) * -5
+    size += e.deltaY < 0 ? 5 : -5
     size = Math.max(10, size)
     el.style.width = size + 'px'
     el.style.height = size + 'px'
     el.style.fontSize = size + 'px'
     if (onUpdate) onUpdate(el)
-  }
-
-  el.addEventListener('pointerdown', handlePointerDown)
-  el.addEventListener('pointermove', handlePointerMove)
-  el.addEventListener('pointerup', handlePointerUp)
-  el.addEventListener('wheel', handleWheel)
-
-  return () => {
-    el.removeEventListener('pointerdown', handlePointerDown)
-    el.removeEventListener('pointermove', handlePointerMove)
-    el.removeEventListener('pointerup', handlePointerUp)
-    el.removeEventListener('wheel', handleWheel)
-  }
+  })
 }
 
 function drawMosaicCanvas(canvas, image, pixel) {
@@ -110,7 +98,7 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
         drawMosaicCanvas(el, uploadedImage, marker.pixel)
       }
     }
-    const cleanupDrag = makeDraggableResizable(el, update)
+    makeDraggableResizable(el, update)
     const handleClick = e => {
       e.stopPropagation()
       if (el._wasDragged) {
@@ -122,7 +110,6 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
     el.addEventListener('click', handleClick)
     return () => {
       el.removeEventListener('click', handleClick)
-      cleanupDrag()
     }
   }, [marker.id, onToggle, uploadedImage])
 
