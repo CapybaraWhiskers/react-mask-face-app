@@ -164,15 +164,17 @@ function App() {
     <div className="app-card">
       <h1>Mask Face App</h1>
       <ImageUploader onChange={handleImageChange} loading={loading} />
-      <ImagePreview
-        imageUrl={imageUrl}
-        markers={markers}
-        imgRef={imgRef}
-        onLoad={handleImageLoad}
-        onUpdate={updateMarker}
-        onToggle={toggleMarker}
-        onClick={() => setMarkers(m => m)}
-      />
+      {!loading && (
+        <ImagePreview
+          imageUrl={imageUrl}
+          markers={markers}
+          imgRef={imgRef}
+          onLoad={handleImageLoad}
+          onUpdate={updateMarker}
+          onToggle={toggleMarker}
+          onClick={() => setMarkers(m => m)}
+        />
+      )}
       <Controls
         maskType={maskType}
         setMaskType={setMaskType}
