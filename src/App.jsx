@@ -41,15 +41,23 @@ function App() {
   const [modelsLoaded, setModelsLoaded] = useState(false)
   const imgRef = useRef(null)
 
-  const handleImageChange = async e => {
+  useEffect(() => {
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl)
+      }
+    }
+  }, [imageUrl])
+
+  const handleImageChange = e => {
     const file = e.target.files[0]
     if (!file) return
     setLoading(true)
     setMarkers([])
-    const form = new FormData()
-    form.append('image', file)
-    const res = await fetch('/api/upload', { method: 'POST', body: form })
-    const { url } = await res.json()
+    if (imageUrl) {
+      URL.revokeObjectURL(imageUrl)
+    }
+    const url = URL.createObjectURL(file)
     setImageUrl(url)
   }
 
