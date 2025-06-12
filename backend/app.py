@@ -15,7 +15,15 @@ def upload():
     if 'image' not in request.files:
         return jsonify({'error': 'No image uploaded'}), 400
     f = request.files['image']
-    filename = secure_filename(f.filename)
+
+    # Remove existing files so only one temporary image is stored
+    for name in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, name)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+    ext = os.path.splitext(secure_filename(f.filename))[1].lower()
+    filename = f"temp{ext if ext else '.png'}"
     path = os.path.join(UPLOAD_FOLDER, filename)
     f.save(path)
     return jsonify({'url': f'/uploads/{filename}'})
