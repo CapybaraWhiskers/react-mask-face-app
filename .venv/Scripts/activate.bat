@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\konno\Desktop\dev\HWS\task3\mask-face-app\converting-to-react\.venv"
+set "VIRTUAL_ENV=C:\Users\konno\Desktop\dev\HWS\task3\EX\react-mask-face-app\.venv"
 
 if not defined PROMPT set PROMPT=$P$G
 
