@@ -38,6 +38,7 @@ function App() {
   const [markers, setMarkers] = useState([])
   const [loading, setLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState(null)
+  const [processed, setProcessed] = useState(false)
   const [modelsLoaded, setModelsLoaded] = useState(false)
   const imgRef = useRef(null)
 
@@ -45,6 +46,7 @@ function App() {
     const file = e.target.files[0]
     if (!file) return
     setLoading(true)
+    setProcessed(false)
     setMarkers([])
     const form = new FormData()
     form.append('image', file)
@@ -99,6 +101,7 @@ function App() {
       }
     })
     setMarkers(newMarkers)
+    setProcessed(true)
     setLoading(false)
   }
 
@@ -176,6 +179,7 @@ function App() {
         onLoad={handleImageLoad}
         onUpdate={updateMarker}
         onToggle={toggleMarker}
+        processed={processed}
         onClick={() => setMarkers(m => m)}
       />
       <Controls
