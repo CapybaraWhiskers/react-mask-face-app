@@ -4,6 +4,7 @@ import Marker from './components/Marker'
 import ImageUploader from './components/ImageUploader'
 import ImagePreview from './components/ImagePreview'
 import Controls from './components/Controls'
+import { drawMosaic } from './utils/canvas'
 import './App.css'
 
 const expressionEmojiMap = {
@@ -18,18 +19,6 @@ const expressionEmojiMap = {
 
 let idCounter = 0
 const nextId = () => ++idCounter
-
-function drawMosaic(ctx, image, sx, sy, sw, sh, pixel) {
-  const tmpW = Math.max(1, Math.floor(sw / pixel))
-  const tmpH = Math.max(1, Math.floor(sh / pixel))
-  const tmp = document.createElement('canvas')
-  tmp.width = tmpW
-  tmp.height = tmpH
-  const tctx = tmp.getContext('2d')
-  tctx.drawImage(image, sx, sy, sw, sh, 0, 0, tmpW, tmpH)
-  ctx.imageSmoothingEnabled = false
-  ctx.drawImage(tmp, 0, 0, tmpW, tmpH, sx, sy, sw, sh)
-}
 
 function App() {
   const [maskType, setMaskType] = useState('emoji')

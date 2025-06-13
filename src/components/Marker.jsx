@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { drawMosaic } from '../utils/canvas'
 
 function makeDraggableResizable(el, onUpdate) {
   let dragging = false
@@ -76,15 +77,7 @@ function drawMosaicCanvas(canvas, image, pixel) {
   canvas.height = height
   const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, width, height)
-  const tmpW = Math.max(1, Math.floor(sw / pixel))
-  const tmpH = Math.max(1, Math.floor(sh / pixel))
-  const tmp = document.createElement('canvas')
-  tmp.width = tmpW
-  tmp.height = tmpH
-  const tctx = tmp.getContext('2d')
-  tctx.drawImage(image, sx, sy, sw, sh, 0, 0, tmpW, tmpH)
-  ctx.imageSmoothingEnabled = false
-  ctx.drawImage(tmp, 0, 0, tmpW, tmpH, 0, 0, width, height)
+  drawMosaic(ctx, image, sx, sy, sw, sh, pixel, 0, 0, width, height)
 }
 
 export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
