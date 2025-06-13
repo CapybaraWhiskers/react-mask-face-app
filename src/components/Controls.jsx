@@ -1,5 +1,7 @@
+// 操作パネルを表示するコンポーネント
 import React from 'react'
 
+// maskType など各種状態と操作関数を受け取る
 export default function Controls({
   maskType,
   setMaskType,
@@ -10,6 +12,7 @@ export default function Controls({
   addMarker,
   downloadImage,
 }) {
+  // 各種操作ボタンとセレクター
   return (
     <div className="button-row">
       <select
@@ -22,6 +25,7 @@ export default function Controls({
         <option value="mosaic">Mosaic</option>
       </select>
       {maskType === 'emoji' ? (
+        // 絵文字を選択
         <select
           id="emojiSelector"
           className="emoji-selector"
@@ -38,6 +42,7 @@ export default function Controls({
           <option value="😮">😮</option>
         </select>
       ) : (
+        // モザイクの場合はサイズ指定のスライダー
         <input
           type="range"
           id="mosaicSize"
@@ -47,9 +52,11 @@ export default function Controls({
           onChange={e => setMosaicSize(parseInt(e.target.value))}
         />
       )}
+      {/* マーカーを追加 */}
       <button id="addMarker" onClick={addMarker}>
         Add Marker
       </button>
+      {/* 加工済み画像を保存 */}
       <button id="download" onClick={downloadImage}>
         Download Masked Image
       </button>

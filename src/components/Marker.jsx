@@ -1,10 +1,13 @@
+// マーカーの描画と操作を担当
 import { useEffect, useRef } from 'react'
 import { drawMosaic } from '../utils/canvas'
 
+// マーカーをドラッグ・リサイズできるようにする
 function makeDraggableResizable(el, onUpdate) {
   let dragging = false
   let startX, startY, startLeft, startTop
 
+  // ドラッグ開始
   el.addEventListener('pointerdown', e => {
     e.stopPropagation()
     dragging = true
@@ -16,6 +19,7 @@ function makeDraggableResizable(el, onUpdate) {
     el.setPointerCapture(e.pointerId)
   })
 
+  // ドラッグ中の処理
   el.addEventListener('pointermove', e => {
     if (!dragging) return
     const dx = e.clientX - startX
@@ -25,12 +29,14 @@ function makeDraggableResizable(el, onUpdate) {
     el._wasDragged = true
   })
 
+  // ドラッグ終了
   el.addEventListener('pointerup', e => {
     dragging = false
     el.releasePointerCapture(e.pointerId)
     if (onUpdate) onUpdate(el)
   })
 
+  // ホイール操作でサイズ変更
   const WHEEL_STEP = 1
   const WHEEL_THRESHOLD = 70
   let wheelDelta = 0
@@ -61,6 +67,7 @@ function makeDraggableResizable(el, onUpdate) {
   })
 }
 
+// マーカー位置に合わせてモザイクを描画
 function drawMosaicCanvas(canvas, image, pixel) {
   if (!image) return
   const scaleX = image.naturalWidth / image.clientWidth
@@ -80,6 +87,7 @@ function drawMosaicCanvas(canvas, image, pixel) {
   drawMosaic(ctx, image, sx, sy, sw, sh, pixel, 0, 0, width, height)
 }
 
+// 個々のマーカー要素
 export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
   const ref = useRef(null)
   const markerRef = useRef(marker)
@@ -88,6 +96,7 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
   const onToggleRef = useRef(onToggle)
 
 
+  // マーカーの状態が変わったときに DOM を更新
   useEffect(() => {
     markerRef.current = marker
     imageRef.current = uploadedImage
@@ -106,6 +115,7 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
     }
   }, [marker, uploadedImage, onUpdate, onToggle])
 
+  // マウント時にドラッグやクリックのイベントを設定
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -135,6 +145,7 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
     }
   }, [])
 
+  // マーカー種別に応じてクラス名を切り替え
   const className = `${marker.type === 'emoji' ? 'emoji-marker' : 'mosaic-marker'}${marker.dimmed ? ' dimmed' : ''}`
 
   if (marker.type === 'emoji') {
