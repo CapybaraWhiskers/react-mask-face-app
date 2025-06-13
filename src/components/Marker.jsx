@@ -30,15 +30,31 @@ function makeDraggableResizable(el, onUpdate) {
     if (onUpdate) onUpdate(el)
   })
 
+  const WHEEL_STEP = 1
+  const WHEEL_THRESHOLD = 70
+  let wheelDelta = 0
   el.addEventListener('wheel', e => {
     e.preventDefault()
+    wheelDelta += e.deltaY
+    let delta = 0
+    while (wheelDelta <= -WHEEL_THRESHOLD) {
+      delta += WHEEL_STEP
+      wheelDelta += WHEEL_THRESHOLD
+    }
+    while (wheelDelta >= WHEEL_THRESHOLD) {
+      delta -= WHEEL_STEP
+      wheelDelta -= WHEEL_THRESHOLD
+    }
+    if (delta === 0) return
     let size = parseFloat(el.style.width)
-    let delta = -e.deltaY * 0.05
-    delta = Math.max(-5, Math.min(5, delta))
+    const centerX = parseFloat(el.style.left) + size / 2
+    const centerY = parseFloat(el.style.top) + size / 2
     size += delta
     size = Math.max(10, size)
     el.style.width = size + 'px'
     el.style.height = size + 'px'
+    el.style.left = centerX - size / 2 + 'px'
+    el.style.top = centerY - size / 2 + 'px'
     el.style.fontSize = size + 'px'
     if (onUpdate) onUpdate(el)
   })
@@ -73,8 +89,17 @@ function drawMosaicCanvas(canvas, image, pixel) {
 
 export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
   const ref = useRef(null)
+  const markerRef = useRef(marker)
+  const imageRef = useRef(uploadedImage)
+  const onUpdateRef = useRef(onUpdate)
+  const onToggleRef = useRef(onToggle)
+
 
   useEffect(() => {
+    markerRef.current = marker
+    imageRef.current = uploadedImage
+    onUpdateRef.current = onUpdate
+    onToggleRef.current = onToggle
     const el = ref.current
     if (!el) return
     el.style.left = marker.x + 'px'
@@ -86,18 +111,20 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
     if (marker.type === 'mosaic') {
       drawMosaicCanvas(el, uploadedImage, marker.pixel)
     }
-  }, [marker, uploadedImage])
+  }, [marker, uploadedImage, onUpdate, onToggle])
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const update = el => {
+      const m = markerRef.current
+      const img = imageRef.current
       const x = parseFloat(el.style.left)
       const y = parseFloat(el.style.top)
       const size = parseFloat(el.style.width)
-      onUpdate(marker.id, { x, y, size })
-      if (marker.type === 'mosaic') {
-        drawMosaicCanvas(el, uploadedImage, marker.pixel)
+      onUpdateRef.current(m.id, { x, y, size })
+      if (m.type === 'mosaic') {
+        drawMosaicCanvas(el, img, m.pixel)
       }
     }
     makeDraggableResizable(el, update)
@@ -107,13 +134,13 @@ export default function Marker({ marker, uploadedImage, onUpdate, onToggle }) {
         el._wasDragged = false
         return
       }
-      onToggle(marker.id)
+      onToggleRef.current(markerRef.current.id)
     }
     el.addEventListener('click', handleClick)
     return () => {
       el.removeEventListener('click', handleClick)
     }
-  }, [marker.id, onToggle, uploadedImage])
+  }, [])
 
   const className = `${marker.type === 'emoji' ? 'emoji-marker' : 'mosaic-marker'}${marker.dimmed ? ' dimmed' : ''}`
 
